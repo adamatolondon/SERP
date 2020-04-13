@@ -436,4 +436,16 @@ public class BCVisitor {
     
     public void exitBootstrapMethod(BootstrapMethods obj) {      
     }
+    
+    public void enterModuleEntry(ModuleEntry obj) {     
+    }
+    
+    public void exitModuleEntry(ModuleEntry obj) {      
+    }
+
+    public void enterPackageEntry(PackageEntry obj) {     
+    }
+    
+    public void exitPackageEntry(PackageEntry obj) {      
+    }
 }

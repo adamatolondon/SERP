@@ -1,6 +1,7 @@
 package serp.bytecode.lowlevel;
 
 import java.io.*;
+import java.lang.invoke.MethodHandle;
 import java.util.*;
 
 import serp.bytecode.visitor.*;
@@ -16,8 +17,8 @@ import serp.util.*;
  * @author Abe White
  */
 public class ConstantPool implements VisitAcceptor {
-    private List _entries = new ArrayList(50);
-    private Map _lookup = new HashMap(50);
+    private List<Entry> _entries = new ArrayList<>(50);
+    private Map<Object,Entry> _lookup = new HashMap<>(50);
 
     /**
      * Default constructor.
@@ -29,13 +30,14 @@ public class ConstantPool implements VisitAcceptor {
      * Return all the entries in the pool.
      */
     public Entry[] getEntries() {
-        List entries = new ArrayList(_entries.size());
+        List<Entry> entries = new ArrayList<>(_entries.size());
         Entry entry;
-        for (Iterator itr = _entries.iterator(); itr.hasNext();) {
+        for (Iterator<Entry> itr = _entries.iterator(); itr.hasNext();) {
             entry = (Entry) itr.next();
             if (entry != null)
                 entries.add(entry);
         }
+        
         return (Entry[]) entries.toArray(new Entry[entries.size()]);
     }
 
@@ -83,6 +85,7 @@ public class ConstantPool implements VisitAcceptor {
         _lookup.put(key, entry);
         if (entry.isWide())
             _entries.add(null);
+        
         return entry.getIndex();
     }
 
@@ -122,7 +125,7 @@ public class ConstantPool implements VisitAcceptor {
      */
     public void clear() {
         Entry entry;
-        for (Iterator itr = _entries.iterator(); itr.hasNext();) {
+        for (Iterator<Entry> itr = _entries.iterator(); itr.hasNext();) {
             entry = (Entry) itr.next();
             if (entry != null) {
                 entry.setPool(null);
@@ -170,7 +173,7 @@ public class ConstantPool implements VisitAcceptor {
      * already exist, and the new entry's index returned
      */
     public int findDoubleEntry(double value, boolean add) {
-        Double key = new Double(value);
+        Double key = Double.valueOf(value);
         int index = find(key);
         if (!add || (index > 0))
             return index;
@@ -186,7 +189,7 @@ public class ConstantPool implements VisitAcceptor {
      * already exist, and the new entry's index returned
      */
     public int findFloatEntry(float value, boolean add) {
-        Float key = new Float(value);
+        Float key = Float.valueOf(value);
         int index = find(key);
         if (!add || index > 0)
             return index;
@@ -403,7 +406,7 @@ public class ConstantPool implements VisitAcceptor {
         visit.enterConstantPool(this);
 
         Entry entry;
-        for (Iterator itr = _entries.iterator(); itr.hasNext();) {
+        for (Iterator<Entry> itr = _entries.iterator(); itr.hasNext();) {
             entry = (Entry) itr.next();
             if (entry == null)
                 continue;
@@ -437,7 +440,7 @@ public class ConstantPool implements VisitAcceptor {
         out.writeShort(_entries.size() + 1);
 
         Entry entry;
-        for (Iterator itr = _entries.iterator(); itr.hasNext();) {
+        for (Iterator<Entry> itr = _entries.iterator(); itr.hasNext();) {
             entry = (Entry) itr.next();
             if (entry != null)
                 Entry.write(entry, out);
@@ -494,6 +497,14 @@ public class ConstantPool implements VisitAcceptor {
             NameAndTypeEntry nte = (NameAndTypeEntry) entry;
             return new NameAndTypeKey(nte.getNameIndex(),
                 nte.getDescriptorIndex());
+        case Entry.METHODHANDLE:
+            return new MethodHandleKey(((MethodHandleEntry)entry).getReferenceIndex());
+        case Entry.METHODTYPE:
+          return new MethodTypeKey(((MethodTypeEntry)entry).getDescriptorIndex());
+        case Entry.MODULE:
+          return new ModuleKey(((ModuleEntry) entry).getNameIndex());
+        case Entry.PACKAGE:
+          return new PackageKey(((PackageEntry) entry).getNameIndex());
         default:
             return null;
         }
@@ -509,6 +520,7 @@ public class ConstantPool implements VisitAcceptor {
             _index = index;
         }
 
+        @Override
         public int hashCode() {
             return _index;
         }
@@ -541,6 +553,42 @@ public class ConstantPool implements VisitAcceptor {
     }
 
     /**
+     * Key for module entries.
+     */
+    private static class ModuleKey extends PtrKey {
+        public ModuleKey(int index) {
+            super(index);
+        }
+    }
+
+    /**
+     * Key for package entries.
+     */
+    private static class PackageKey extends PtrKey {
+        public PackageKey(int index) {
+            super(index);
+        }
+    }
+
+    /**
+     * Key for method handle entries.
+     */
+    private static class MethodHandleKey extends PtrKey {
+        public MethodHandleKey(int index) {
+            super(index);
+        }
+    }
+
+    /**
+     * Key for method type entries.
+     */
+    private static class MethodTypeKey extends PtrKey {
+        public MethodTypeKey(int index) {
+            super(index);
+        }
+    }
+
+    /**
      * Base class key for entries with two ptr to other entries.
      */
     private static abstract class DoublePtrKey {
@@ -552,6 +600,7 @@ public class ConstantPool implements VisitAcceptor {
             _index2 = index2;
         }
 
+        @Override
         public int hashCode() {
             return _index1 ^ _index2;
         }

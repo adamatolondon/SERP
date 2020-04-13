@@ -30,6 +30,8 @@ public abstract class Entry implements VisitAcceptor {
     public static final int METHODHANDLE = 15;
     public static final int METHODTYPE = 16;
     public static final int INVOKEDYNAMIC = 18;
+    public static final int MODULE = 19;
+    public static final int PACKAGE = 20;
     
     private ConstantPool _pool = null;
     private int _index = 0;
@@ -135,7 +137,8 @@ public abstract class Entry implements VisitAcceptor {
     Object beforeModify() {
         if (_pool == null)
             return null;
-        return _pool.getKey(this);
+        
+        return ConstantPool.getKey(this);
     }
 
     /**

@@ -48,7 +48,11 @@ public class MethodHandleEntry extends Entry {
     public int getReferenceKind() {
         return _reference_kind;
     }
-    
+
+    public int getReferenceIndex() {
+      return _reference_index;
+  }
+
     public void setReferenceKind(int referenceKind) throws IllegalArgumentException {
         if (referenceKind < 1 || referenceKind > 9) {
             throw new IllegalArgumentException("MethodHandle referencekind cannot accept a value of " + referenceKind);

@@ -54,6 +54,12 @@ public class ConstantPoolTable {
             case 1: // utf8
                 idx += (3 + readUnsignedShort(b, idx + 1));
                 break;
+            case 7: // class
+            case 8: // string
+            case 19: // module
+            case 20: // package
+              idx += 3;
+              break;
             case 3: // integer
             case 4: // float
             case 9: // field

@@ -1,11 +1,15 @@
 package serp.bytecode;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
 
-import serp.bytecode.lowlevel.*;
-import serp.bytecode.visitor.*;
-import serp.util.*;
+import serp.bytecode.visitor.BCVisitor;
+import serp.bytecode.visitor.VisitAcceptor;
+import serp.util.Strings;
 
 /**
  * The Project represents a working set of classes. It caches parsed
