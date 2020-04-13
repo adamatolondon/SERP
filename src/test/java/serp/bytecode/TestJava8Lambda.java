@@ -31,7 +31,7 @@ public class TestJava8Lambda {
   @BeforeEach
   void init() throws URISyntaxException {
     simpleLambdaUsingClassFile=Paths
-        .get(getClass().getResource("/java8/SimpleLambdaUsingClass.class").toURI()).toFile();
+        .get(getClass().getResource("/java8/SimpleLambdaUsingClass.classz").toURI()).toFile();
   }
 
 
