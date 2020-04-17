@@ -444,7 +444,11 @@ public class BCMethod extends BCMember implements VisitAcceptor {
         }
         if (!add)
             return null;
-        return (Code) addAttribute(Constants.ATTR_CODE);
+        
+        Attribute attribute=addAttribute(Constants.ATTR_CODE);
+        System.out.println("getCode: attribute.getClass().getCanonicalName()="+attribute.getClass().getCanonicalName());
+//        return (Code) addAttribute(Constants.ATTR_CODE);
+        return (Code)attribute;
     }
 
     /**

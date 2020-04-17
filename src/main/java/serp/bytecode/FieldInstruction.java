@@ -1,11 +1,13 @@
 package serp.bytecode;
 
-import java.io.*;
-import java.lang.reflect.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
+import java.lang.reflect.Field;
 
-import serp.bytecode.lowlevel.*;
-import serp.bytecode.visitor.*;
-import serp.util.*;
+import serp.bytecode.lowlevel.ComplexEntry;
+import serp.bytecode.lowlevel.ConstantPool;
+import serp.util.Strings;
 
 /**
  * Instruction that takes as an argument a field to operate

@@ -1,8 +1,8 @@
 package serp.bytecode;
 
-import java.util.*;
-
-import serp.bytecode.lowlevel.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * State implementing the behavior of a primitive class.
@@ -50,11 +50,11 @@ class PrimitiveState extends State {
         return Collections.EMPTY_LIST;
     }
 
-    public List getMethodsHolder() {
+    public List<BCMethod> getMethodsHolder() {
         return Collections.EMPTY_LIST;
     }
 
-    public Collection getAttributesHolder() {
+    public Collection<Attribute> getAttributesHolder() {
         return Collections.EMPTY_LIST;
     }
 

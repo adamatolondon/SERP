@@ -1,10 +1,12 @@
 package serp.bytecode;
 
-import java.io.*;
-import java.util.*;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.IOException;
 
-import serp.bytecode.lowlevel.*;
-import serp.bytecode.visitor.*;
+import serp.bytecode.lowlevel.ConstantPool;
+import serp.bytecode.visitor.BCVisitor;
+import serp.bytecode.visitor.VisitAcceptor;
 
 /**
  * A line number corresponds to a sequence of opcodes that map logically

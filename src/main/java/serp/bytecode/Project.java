@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import serp.bytecode.visitor.BCVisitor;
 import serp.bytecode.visitor.VisitAcceptor;
@@ -30,7 +31,7 @@ import serp.util.Strings;
  */
 public class Project implements VisitAcceptor {
     private final String _name;
-    private final HashMap _cache = new HashMap();
+    private final Map<String,BCClass> _cache = new HashMap<>();
     private final NameCache _names = new NameCache();
 
     /**
@@ -126,7 +127,7 @@ public class Project implements VisitAcceptor {
      * @param type the class to parse
      * @throws RuntimeException on parse error
      */
-    public BCClass loadClass(Class type) {
+    public BCClass loadClass(Class<?> type) {
         BCClass cached = checkCache(type.getName());
         if (cached != null)
             return cached;
@@ -256,10 +257,10 @@ public class Project implements VisitAcceptor {
      * Clears all classes from this project.
      */
     public void clear() {
-        Collection values = _cache.values();
+        Collection<BCClass> values = _cache.values();
         BCClass bc;
-        for (Iterator itr = values.iterator(); itr.hasNext();) {
-            bc = (BCClass) itr.next();
+        for (Iterator<BCClass> itr = values.iterator(); itr.hasNext();) {
+            bc = itr.next();
             itr.remove();
             bc.invalidate();
         }
@@ -282,7 +283,7 @@ public class Project implements VisitAcceptor {
      *
      * @return true if the class belonged to this project, false otherwise
      */
-    public boolean removeClass(Class type) {
+    public boolean removeClass(Class<?> type) {
         if (type == null)
             return false;
         return removeClass(checkCache(type.getName()));
@@ -307,7 +308,7 @@ public class Project implements VisitAcceptor {
      * Return all loaded classes in the project.
      */
     public BCClass[] getClasses() {
-        Collection values = _cache.values();
+        Collection<BCClass> values = _cache.values();
         return (BCClass[]) values.toArray(new BCClass[values.size()]);
     }
 
@@ -321,7 +322,7 @@ public class Project implements VisitAcceptor {
     /**
      * Return true if the project already contains the given class.
      */
-    public boolean containsClass(Class type) {
+    public boolean containsClass(Class<?> type) {
         return (type == null) ? false : containsClass(type.getName());
     }
 

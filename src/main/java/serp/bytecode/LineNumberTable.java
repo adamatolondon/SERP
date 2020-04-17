@@ -14,7 +14,7 @@ import serp.bytecode.visitor.*;
  * @author Abe White
  */
 public class LineNumberTable extends Attribute implements InstructionPtr {
-    private List _lineNumbers = new ArrayList();
+    private List<LineNumber> _lineNumbers = new ArrayList<>();
 
     LineNumberTable(int nameIndex, Attributes owner) {
         super(nameIndex, owner);
@@ -34,8 +34,8 @@ public class LineNumberTable extends Attribute implements InstructionPtr {
      */
     public LineNumber getLineNumber(int pc) {
         for (int i = _lineNumbers.size() - 1; i >= 0; i--)
-            if (((LineNumber) _lineNumbers.get(i))._target.getByteIndex() <= pc)
-                return (LineNumber) _lineNumbers.get(i);
+            if (_lineNumbers.get(i)._target.getByteIndex() <= pc)
+                return _lineNumbers.get(i);
         return null;
     }
 
@@ -105,7 +105,8 @@ public class LineNumberTable extends Attribute implements InstructionPtr {
      */
     public void clear() {
         for (int i = 0; i < _lineNumbers.size(); i++)
-            ((LineNumber) _lineNumbers.get(i)).invalidate();
+            _lineNumbers.get(i).invalidate();
+        
         _lineNumbers.clear();
     }
 
@@ -141,12 +142,12 @@ public class LineNumberTable extends Attribute implements InstructionPtr {
 
     public void updateTargets() {
         for (int i = 0; i < _lineNumbers.size(); i++)
-            ((LineNumber) _lineNumbers.get(i)).updateTargets();
+            _lineNumbers.get(i).updateTargets();
     }
 
     public void replaceTarget(Instruction oldTarget, Instruction newTarget) {
         for (int i = 0; i < _lineNumbers.size(); i++)
-            ((LineNumber) _lineNumbers.get(i)).replaceTarget(oldTarget,
+            _lineNumbers.get(i).replaceTarget(oldTarget,
                 newTarget);
     }
 

@@ -113,7 +113,7 @@ class State {
      * state does not support changing the interfaces, the returned
      * list should be immutable.
      */
-    public List getInterfacesHolder() {
+    public List<Number> getInterfacesHolder() {
         throw new UnsupportedOperationException();
     }
 
@@ -122,7 +122,7 @@ class State {
      * If the state does not support changing the fields, the returned
      * list should be immutable.
      */
-    public List getFieldsHolder() {
+    public List<BCField> getFieldsHolder() {
         throw new UnsupportedOperationException();
     }
 
@@ -131,7 +131,7 @@ class State {
      * If the state does not support changing the methods, the returned
      * list should be immutable.
      */
-    public List getMethodsHolder() {
+    public List<BCMethod> getMethodsHolder() {
         throw new UnsupportedOperationException();
     }
 
@@ -140,7 +140,7 @@ class State {
      * none. If the state does not support changing the attributes, the
      * returned list should be immutable.
      */
-    public Collection getAttributesHolder() {
+    public Collection<Attribute> getAttributesHolder() {
         throw new UnsupportedOperationException();
     }
 

@@ -33,7 +33,8 @@ public class BCClassLoader extends ClassLoader {
         return _project;
     }
 
-    protected Class findClass(String name) throws ClassNotFoundException {
+    @Override
+    protected Class<?> findClass(String name) throws ClassNotFoundException {
         byte[] bytes;
         try {
             BCClass type;

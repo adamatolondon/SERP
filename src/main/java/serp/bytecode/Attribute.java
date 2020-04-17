@@ -89,7 +89,7 @@ public abstract class Attribute extends Attributes implements VisitAcceptor {
         return _owner != null;
     }
 
-    Collection getAttributesHolder() {
+    Collection<Attribute> getAttributesHolder() {
         return Collections.EMPTY_LIST;
     }
 

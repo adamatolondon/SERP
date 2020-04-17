@@ -123,7 +123,6 @@ public class TestJava8Lambda {
     // MethodType;Ljava/lang/invoke/MethodType;Ljava/lang/invoke/MethodHandle;Ljava/lang/invoke/
     // MethodType;)Ljava/lang/invoke/CallSite;
 
-    // new PrintCP().printConstantPool(cp);
     Entry ent52=cp.getEntry(23);
     assertNotNull(ent52);
     {

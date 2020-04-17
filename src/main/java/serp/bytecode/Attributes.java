@@ -18,7 +18,7 @@ public abstract class Attributes implements BCEntity {
      * @return all owned attributes, or empty array if none
      */
     public Attribute[] getAttributes() {
-        Collection attrs = getAttributesHolder();
+        Collection<Attribute> attrs = getAttributesHolder();
         return (Attribute[]) attrs.toArray(new Attribute[attrs.size()]);
     }
 
@@ -27,13 +27,14 @@ public abstract class Attributes implements BCEntity {
      * share the name, which is returned is undefined.
      */
     public Attribute getAttribute(String name) {
-        Collection attrs = getAttributesHolder();
+        Collection<Attribute> attrs = getAttributesHolder();
         Attribute attr;
-        for (Iterator itr = attrs.iterator(); itr.hasNext();) {
-            attr = (Attribute) itr.next();
+        for (Iterator<Attribute> itr = attrs.iterator(); itr.hasNext();) {
+            attr = itr.next();
             if (attr.getName().equals(name))
                 return attr;
         }
+        
         return null;
     }
 
@@ -43,14 +44,15 @@ public abstract class Attributes implements BCEntity {
      * @return the matching attributes, or empty array if none
      */
     public Attribute[] getAttributes(String name) {
-        List matches = new LinkedList();
-        Collection attrs = getAttributesHolder();
+        List<Attribute> matches = new LinkedList<>();
+        Collection<Attribute> attrs = getAttributesHolder();
         Attribute attr;
-        for (Iterator itr = attrs.iterator(); itr.hasNext();) {
-            attr = (Attribute) itr.next();
+        for (Iterator<Attribute> itr = attrs.iterator(); itr.hasNext();) {
+            attr = itr.next();
             if (attr.getName().equals(name))
                 matches.add(attr);
         }
+        
         return (Attribute[]) matches.toArray(new Attribute[matches.size()]);
     }
 
@@ -88,10 +90,10 @@ public abstract class Attributes implements BCEntity {
      * Clear all attributes from this entity.
      */
     public void clearAttributes() {
-        Collection attrs = getAttributesHolder();
+        Collection<Attribute> attrs = getAttributesHolder();
         Attribute attr;
-        for (Iterator itr = attrs.iterator(); itr.hasNext();) {
-            attr = (Attribute) itr.next();
+        for (Iterator<Attribute> itr = attrs.iterator(); itr.hasNext();) {
+            attr = itr.next();
             itr.remove();
             attr.invalidate();
         }
@@ -126,8 +128,8 @@ public abstract class Attributes implements BCEntity {
      */
     void visitAttributes(BCVisitor visit) {
         Attribute attr;
-        for (Iterator itr = getAttributesHolder().iterator(); itr.hasNext();) {
-            attr = (Attribute) itr.next();
+        for (Iterator<Attribute> itr = getAttributesHolder().iterator(); itr.hasNext();) {
+            attr = itr.next();
             visit.enterAttribute(attr);
             attr.acceptVisit(visit);
             visit.exitAttribute(attr);
@@ -140,16 +142,17 @@ public abstract class Attributes implements BCEntity {
      * requires access to the constant pool, which must already by read.
      */
     void readAttributes(DataInput in) throws IOException {
-        Collection attrs = getAttributesHolder();
+        Collection<Attribute> attrs = getAttributesHolder();
         attrs.clear();
 
         Attribute attribute;
         String name;
+        // attributes_count, attribute_info[attributes_count]
         for (int i = in.readUnsignedShort(); i > 0; i--) {
             name = ((UTF8Entry) getPool().getEntry(in.readUnsignedShort())).
-                getValue();
+                getValue(); // attribute_name_index
             attribute = addAttribute(name);
-            attribute.read(in, in.readInt());
+            attribute.read(in, in.readInt()); // attribute_length
         }
     }
 
@@ -158,13 +161,13 @@ public abstract class Attributes implements BCEntity {
      * Relies on the ability of attributes to write themselves.
      */
     void writeAttributes(DataOutput out) throws IOException {
-        Collection attrs = getAttributesHolder();
+        Collection<Attribute> attrs = getAttributesHolder();
         out.writeShort(attrs.size());
 
         Attribute attribute;
         int length;
-        for (Iterator itr = attrs.iterator(); itr.hasNext();) {
-            attribute = (Attribute) itr.next();
+        for (Iterator<Attribute> itr = attrs.iterator(); itr.hasNext();) {
+            attribute = itr.next();
             out.writeShort(attribute.getNameIndex());
             length = attribute.getLength();
             out.writeInt(length);
@@ -175,5 +178,5 @@ public abstract class Attributes implements BCEntity {
     /**
      * Return the collection used to hold the attributes of this entity.
      */
-    abstract Collection getAttributesHolder();
+    abstract Collection<Attribute> getAttributesHolder();
 }

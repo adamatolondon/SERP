@@ -1,10 +1,20 @@
 package serp.bytecode;
 
-import java.io.*;
-import java.util.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInput;
+import java.io.DataInputStream;
+import java.io.DataOutput;
+import java.io.DataOutputStream;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.ListIterator;
+import java.util.NoSuchElementException;
 
-import serp.bytecode.lowlevel.*;
-import serp.bytecode.visitor.*;
+import serp.bytecode.visitor.BCVisitor;
 
 /**
  * Representation of a code block of a class.
@@ -36,8 +46,8 @@ public class Code extends Attribute {
     private int _maxStack = 0;
     private int _maxLocals = 0;
     private int _size = 0;
-    private Collection _handlers = new LinkedList();
-    private Collection _attrs = new LinkedList();
+    private Collection<ExceptionHandler> _handlers = new LinkedList<>();
+    private Collection<Attribute> _attrs = new LinkedList<>();
     private boolean _byteIndexesValid;
 
     Code(int nameIndex, Attributes owner) {
@@ -66,7 +76,7 @@ public class Code extends Attribute {
         return (BCMethod) getOwner();
     }
 
-    Collection getAttributesHolder() {
+    Collection<Attribute> getAttributesHolder() {
         return _attrs;
     }
 
@@ -261,7 +271,7 @@ public class Code extends Attribute {
      * if multiple handlers catch the given type, which is returned is
      * undefined.
      */
-    public ExceptionHandler getExceptionHandler(Class catchType) {
+    public ExceptionHandler getExceptionHandler(Class<?> catchType) {
         if (catchType == null)
             return getExceptionHandler((String) null);
         return getExceptionHandler(catchType.getName());
@@ -285,7 +295,7 @@ public class Code extends Attribute {
     public ExceptionHandler[] getExceptionHandlers(String catchType) {
         catchType = getProject().getNameCache().getExternalForm(catchType, 
             false);
-        List matches = new LinkedList();
+        List<ExceptionHandler> matches = new LinkedList<>();
         String type;
         ExceptionHandler[] handlers = getExceptionHandlers();
         for (int i = 0; i < handlers.length; i++) {
@@ -302,7 +312,7 @@ public class Code extends Attribute {
      * Return all exception handlers that catch the given exception type,
      * or an empty array if none.
      */
-    public ExceptionHandler[] getExceptionHandlers(Class catchType) {
+    public ExceptionHandler[] getExceptionHandlers(Class<?> catchType) {
         if (catchType == null)
             return getExceptionHandlers((String) null);
         return getExceptionHandlers(catchType.getName());
@@ -375,7 +385,7 @@ public class Code extends Attribute {
      * @param catchType the type of exception being caught
      */
     public ExceptionHandler addExceptionHandler(Instruction tryStart,
-        Instruction tryEnd, Instruction handlerStart, Class catchType) {
+        Instruction tryEnd, Instruction handlerStart, Class<?> catchType) {
         String catchName = null;
         if (catchType != null)
             catchName = catchType.getName();
@@ -403,7 +413,7 @@ public class Code extends Attribute {
      */
     public void clearExceptionHandlers() {
         ExceptionHandler handler;
-        for (Iterator itr = _handlers.iterator(); itr.hasNext();) {
+        for (Iterator<ExceptionHandler> itr = _handlers.iterator(); itr.hasNext();) {
             handler = (ExceptionHandler) itr.next();
             itr.remove();
             handler.invalidate();
@@ -422,7 +432,7 @@ public class Code extends Attribute {
      *
      * @return true if the handler was removed, false otherwise
      */
-    public boolean removeExceptionHandler(Class catchType) {
+    public boolean removeExceptionHandler(Class<?> catchType) {
         if (catchType == null)
             return removeExceptionHandler((String) null);
         return removeExceptionHandler(catchType.getName());
@@ -1846,6 +1856,7 @@ public class Code extends Attribute {
         return length;
     }
 
+    @Override
     public void acceptVisit(BCVisitor visit) {
         visit.enterCode(this);
         Instruction ins;
@@ -1855,8 +1866,9 @@ public class Code extends Attribute {
             ins.acceptVisit(visit);
             visit.exitInstruction(ins);
         }
-        for (Iterator i = _handlers.iterator(); i.hasNext();)
-            ((ExceptionHandler) i.next()).acceptVisit(visit);
+        for (Iterator<ExceptionHandler> i = _handlers.iterator(); i.hasNext();)
+            i.next().acceptVisit(visit);
+
         visitAttributes(visit);
         visit.exitCode(this);
     }
@@ -2016,6 +2028,7 @@ public class Code extends Attribute {
         beforeFirst();
     }
 
+    @Override
     void read(DataInput in, int length) throws IOException {
         _maxStack = in.readUnsignedShort();
         _maxLocals = in.readUnsignedShort();
@@ -2048,6 +2061,7 @@ public class Code extends Attribute {
             lines.updateTargets();
     }
 
+    @Override
     void write(DataOutput out, int length) throws IOException {
         out.writeShort(_maxStack);
         out.writeShort(_maxLocals);
@@ -2057,8 +2071,9 @@ public class Code extends Attribute {
         out.write(code);
 
         out.writeShort(_handlers.size());
-        for (Iterator itr = _handlers.iterator(); itr.hasNext();)
-            ((ExceptionHandler) itr.next()).write(out);
+        for (Iterator<ExceptionHandler> itr = _handlers.iterator(); itr.hasNext();)
+            itr.next().write(out);
+        
         writeAttributes(out);
     }
 

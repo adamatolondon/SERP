@@ -95,14 +95,14 @@ public class BCClass extends Annotated implements VisitAcceptor {
         _state.setIndex(in.readUnsignedShort());
         _state.setSuperclassIndex(in.readUnsignedShort());
 
-        List interfaces = _state.getInterfacesHolder();
+        List<Number> interfaces = _state.getInterfacesHolder();
         interfaces.clear();
         int interfaceCount = in.readUnsignedShort();
         for (int i = 0; i < interfaceCount; i++)
             interfaces.add(Numbers.valueOf(in.readUnsignedShort()));
 
         // fields
-        List fields = _state.getFieldsHolder();
+        List<BCField> fields = _state.getFieldsHolder();
         fields.clear();
         int fieldCount = in.readUnsignedShort();
         BCField field;
@@ -113,7 +113,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
         }
 
         // methods
-        List methods = _state.getMethodsHolder();
+        List<BCMethod> methods = _state.getMethodsHolder();
         methods.clear();
         int methodCount = in.readUnsignedShort();
         BCMethod method;
@@ -131,7 +131,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Initialize from the bytecode of the definition of the given class.
      * For use by the owning project only.
      */
-    void read(Class type) throws IOException {
+    void read(Class<?> type) throws IOException {
         // find out the length of the package name
         int dotIndex = type.getName().lastIndexOf('.') + 1;
 
@@ -171,7 +171,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
         String name = getName();
         int dotIndex = name.lastIndexOf('.') + 1;
         name = name.substring(dotIndex);
-        Class type = getType();
+        Class<?> type = getType();
 
         // attempt to get the class file for the class as a stream;
         // we need to use the url decoder in case the target directory
@@ -219,22 +219,22 @@ public class BCClass extends Annotated implements VisitAcceptor {
         out.writeShort(_state.getSuperclassIndex());
 
         // interfaces
-        List interfaces = _state.getInterfacesHolder();
+        List<Number> interfaces = _state.getInterfacesHolder();
         out.writeShort(interfaces.size());
-        for (Iterator itr = interfaces.iterator(); itr.hasNext();)
-            out.writeShort(((Number) itr.next()).intValue());
+        for (Iterator<Number> itr = interfaces.iterator(); itr.hasNext();)
+            out.writeShort(itr.next().intValue());
 
         // fields
-        List fields = _state.getFieldsHolder();
+        List<BCField> fields = _state.getFieldsHolder();
         out.writeShort(fields.size());
-        for (Iterator itr = fields.iterator(); itr.hasNext();)
-            ((BCField) itr.next()).write(out);
+        for (Iterator<BCField> itr = fields.iterator(); itr.hasNext();)
+            itr.next().write(out);
 
         // methods
-        List methods = _state.getMethodsHolder();
+        List<BCMethod> methods = _state.getMethodsHolder();
         out.writeShort(methods.size());
-        for (Iterator itr = methods.iterator(); itr.hasNext();)
-            ((BCMethod) itr.next()).write(out);
+        for (Iterator<BCMethod> itr = methods.iterator(); itr.hasNext();)
+            itr.next().write(out);
 
         // attributes
         writeAttributes(out);
@@ -562,7 +562,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
     /**
      * Return the {@link Class} object for this class, if it is loadable.
      */
-    public Class getType() {
+    public Class<?> getType() {
         return Strings.toClass(getName(), getClassLoader());
     }
 
@@ -577,7 +577,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
     /**
      * Return the component type of this class, or null if not an array.
      */
-    public Class getComponentType() {
+    public Class<?> getComponentType() {
         String componentName = getComponentName();
         if (componentName == null)
             return null;
@@ -628,7 +628,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Return the {@link Class} object for the superclass of this class, if it
      * is loadable. Returns null for types without superclasses.
      */
-    public Class getSuperclassType() {
+    public Class<?> getSuperclassType() {
         String name = getSuperclassName();
         if (name == null)
             return null;
@@ -660,7 +660,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
     /**
      * Set the superclass of this class.
      */
-    public void setSuperclass(Class type) {
+    public void setSuperclass(Class<?> type) {
         if (type == null)
             setSuperclass((String) null);
         else
@@ -689,7 +689,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * @return the implmented interfaces, or an empty array if none
      */
     public int[] getDeclaredInterfaceIndexes() {
-        List interfaces = _state.getInterfacesHolder();
+        List<Number> interfaces = _state.getInterfacesHolder();
         int[] indexes = new int[interfaces.size()];
         for (int i = 0; i < interfaces.size(); i++)
             indexes[i] = ((Number) interfaces.get(i)).intValue();
@@ -702,7 +702,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * it implements/extends; set to null or an empty array if none.
      */
     public void setDeclaredInterfaceIndexes(int[] interfaceIndexes) {
-        List stateIndexes = _state.getInterfacesHolder();
+        List<Number> stateIndexes = _state.getInterfacesHolder();
         stateIndexes.clear();
         Integer idx;
         for (int i = 0; i < interfaceIndexes.length; i++) {
@@ -733,9 +733,9 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Return the {@link Class} objects for the declared interfaces of this
      * class, or an empty array if none.
      */
-    public Class[] getDeclaredInterfaceTypes() {
+    public Class<?>[] getDeclaredInterfaceTypes() {
         String[] names = getDeclaredInterfaceNames();
-        Class[] types = new Class[names.length];
+        Class<?>[] types = new Class[names.length];
         for (int i = 0; i < names.length; i++)
             types[i] = Strings.toClass(names[i], getClassLoader());
         return types;
@@ -768,7 +768,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Set the interfaces declared implemented/extended by this class; set to
      * null or an empty array if none.
      */
-    public void setDeclaredInterfaces(Class[] interfaces) {
+    public void setDeclaredInterfaces(Class<?>[] interfaces) {
         String[] names = null;
         if (interfaces != null) {
             names = new String[interfaces.length];
@@ -799,7 +799,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * This method does not recurse into interfaces-of-interfaces.
      */
     public String[] getInterfaceNames() {
-        Collection allNames = new LinkedList();
+        Collection<String> allNames = new LinkedList<>();
         String[] names;
         for (BCClass type = this; type != null; type = type.getSuperclassBC()) {
             names = type.getDeclaredInterfaceNames();
@@ -814,9 +814,9 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * by this class, including those of all superclasses.
      * This method does not recurse into interfaces-of-interfaces.
      */
-    public Class[] getInterfaceTypes() {
-        Collection allTypes = new LinkedList();
-        Class[] types;
+    public Class<?>[] getInterfaceTypes() {
+        Collection<Class<?>> allTypes = new LinkedList<>();
+        Class<?>[] types;
         for (BCClass type = this; type != null; type = type.getSuperclassBC()) {
             types = type.getDeclaredInterfaceTypes();
             for (int i = 0; i < types.length; i++)
@@ -831,7 +831,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * This method does not recurse into interfaces-of-interfaces.
      */
     public BCClass[] getInterfaceBCs() {
-        Collection allTypes = new LinkedList();
+        Collection<BCClass> allTypes = new LinkedList<>();
         BCClass[] types;
         for (BCClass type = this; type != null; type = type.getSuperclassBC()) {
             types = type.getDeclaredInterfaceBCs();
@@ -855,7 +855,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      */
     public boolean removeDeclaredInterface(String name) {
         String[] names = getDeclaredInterfaceNames();
-        Iterator itr = _state.getInterfacesHolder().iterator();
+        Iterator<Number> itr = _state.getInterfacesHolder().iterator();
         for (int i = 0; i < names.length; i++) {
             itr.next();
             if (names[i].equals(name)) {
@@ -871,7 +871,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      *
      * @return true if the class had the interface, false otherwise
      */
-    public boolean removeDeclaredInterface(Class type) {
+    public boolean removeDeclaredInterface(Class<?> type) {
         if (type == null)
             return false;
         return removeDeclaredInterface(type.getName());
@@ -894,8 +894,9 @@ public class BCClass extends Annotated implements VisitAcceptor {
     public void moveDeclaredInterface(int fromIdx, int toIdx) {
         if (fromIdx == toIdx)
             return;
-        List interfaces = _state.getInterfacesHolder();
-        Object o = interfaces.remove(fromIdx);
+        
+        List<Number> interfaces = _state.getInterfacesHolder();
+        Number o = interfaces.remove(fromIdx);
         interfaces.add(toIdx, o);
     }
 
@@ -905,7 +906,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
     public void declareInterface(String name) {
         Integer index = Numbers.valueOf(getPool().findClassEntry(_project.
             getNameCache().getInternalForm(name, false), true));
-        List interfaces = _state.getInterfacesHolder();
+        List<Number> interfaces = _state.getInterfacesHolder();
         if (!interfaces.contains(index))
             interfaces.add(index);
     }
@@ -913,7 +914,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
     /**
      * Add an interface to those declared by this class.
      */
-    public void declareInterface(Class type) {
+    public void declareInterface(Class<?> type) {
         declareInterface(type.getName());
     }
 
@@ -946,7 +947,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * the given interface/class.
      * This method does not recurse into interfaces-of-interfaces.
      */
-    public boolean isInstanceOf(Class type) {
+    public boolean isInstanceOf(Class<?> type) {
         if (type == null)
             return false;
         return isInstanceOf(type.getName());
@@ -971,7 +972,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Return all the declared fields of this class, or an empty array if none.
      */
     public BCField[] getDeclaredFields() {
-        List fields = _state.getFieldsHolder();
+        List<BCField> fields = _state.getFieldsHolder();
         return (BCField[]) fields.toArray(new BCField[fields.size()]);
     }
 
@@ -991,7 +992,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * superclasses, or an empty array if none.
      */
     public BCField[] getFields() {
-        Collection allFields = new LinkedList();
+        Collection<BCField> allFields = new LinkedList<>();
         BCField[] fields;
         for (BCClass type = this; type != null; type = type.getSuperclassBC()) {
             fields = type.getDeclaredFields();
@@ -1006,7 +1007,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * superclasses, or an empty array if none.
      */
     public BCField[] getFields(String name) {
-        List matches = new LinkedList();
+        List<BCField> matches = new LinkedList<>();
         BCField[] fields = getFields();
         for (int i = 0; i < fields.length; i++)
             if (fields[i].getName().equals(name))
@@ -1055,7 +1056,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      *
      * @return the added field
      */
-    public BCField declareField(String name, Class type) {
+    public BCField declareField(String name, Class<?> type) {
         String typeName = (type == null) ? null : type.getName();
         return declareField(name, typeName);
     }
@@ -1074,10 +1075,10 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Clear all fields from this class.
      */
     public void clearDeclaredFields() {
-        List fields = _state.getFieldsHolder();
+        List<BCField> fields = _state.getFieldsHolder();
         BCField field;
-        for (Iterator itr = fields.iterator(); itr.hasNext();) {
-            field = (BCField) itr.next();
+        for (Iterator<BCField> itr = fields.iterator(); itr.hasNext();) {
+            field = itr.next();
             itr.remove();
             field.invalidate();
         }
@@ -1090,10 +1091,10 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * @return true if this class contained the field, false otherwise
      */
     public boolean removeDeclaredField(String name) {
-        List fields = _state.getFieldsHolder();
+        List<BCField> fields = _state.getFieldsHolder();
         BCField field;
-        for (Iterator itr = fields.iterator(); itr.hasNext();) {
-            field = (BCField) itr.next();
+        for (Iterator<BCField> itr = fields.iterator(); itr.hasNext();) {
+            field = itr.next();
             if (field.getName().equals(name)) {
                 itr.remove();
                 field.invalidate();
@@ -1121,8 +1122,8 @@ public class BCClass extends Annotated implements VisitAcceptor {
     public void moveDeclaredField(int fromIdx, int toIdx) {
         if (fromIdx == toIdx)
             return;
-        List fields = _state.getFieldsHolder();
-        Object o = fields.remove(fromIdx);
+        List<BCField> fields = _state.getFieldsHolder();
+        BCField o = fields.remove(fromIdx);
         fields.add(toIdx, o);
     }
 
@@ -1135,7 +1136,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * initializers are included.
      */
     public BCMethod[] getDeclaredMethods() {
-        List methods = _state.getMethodsHolder();
+        List<BCMethod> methods = _state.getMethodsHolder();
         return (BCMethod[]) methods.toArray(new BCMethod[methods.size()]);
     }
 
@@ -1161,7 +1162,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * and static initializers are named <code>&lt;clinit&gt;</code>.
      */
     public BCMethod[] getDeclaredMethods(String name) {
-        Collection matches = new LinkedList();
+        Collection<BCMethod> matches = new LinkedList<>();
         BCMethod[] methods = getDeclaredMethods();
         for (int i = 0; i < methods.length; i++)
             if (methods[i].getName().equals(name))
@@ -1212,7 +1213,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Note that in bytecode, constructors are named <code>&lt;init&gt;</code>
      * and static initializers are named <code>&lt;clinit&gt;</code>.
      */
-    public BCMethod getDeclaredMethod(String name, Class[] paramTypes) {
+    public BCMethod getDeclaredMethod(String name, Class<?>[] paramTypes) {
         if (paramTypes == null)
             return getDeclaredMethod(name, (String[]) null);
 
@@ -1249,12 +1250,13 @@ public class BCClass extends Annotated implements VisitAcceptor {
             paramTypes = new String[0];
 
         BCMethod[] methods = getDeclaredMethods();
-        List matches = null;
+        List<BCMethod> matches = null;
         for (int i = 0; i < methods.length; i++) {
             if (methods[i].getName().equals(name) 
                 && paramsMatch(methods[i], paramTypes)) {
                 if (matches == null)
-                    matches = new ArrayList(3);
+                    matches = new ArrayList<>(3);
+                
                 matches.add(methods[i]);
             }
         }
@@ -1268,7 +1270,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Note that in bytecode, constructors are named <code>&lt;init&gt;</code>
      * and static initializers are named <code>&lt;clinit&gt;</code>.
      */
-    public BCMethod[] getDeclaredMethods(String name, Class[] paramTypes) {
+    public BCMethod[] getDeclaredMethods(String name, Class<?>[] paramTypes) {
         if (paramTypes == null)
             return getDeclaredMethods(name, (String[]) null);
 
@@ -1321,8 +1323,8 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Note that in bytecode, constructors are named <code>&lt;init&gt;</code>
      * and static initializers are named <code>&lt;clinit&gt;</code>.
      */
-    public BCMethod getDeclaredMethod(String name, Class returnType, 
-        Class[] paramTypes) {
+    public BCMethod getDeclaredMethod(String name, Class<?> returnType, 
+        Class<?>[] paramTypes) {
         if (paramTypes == null)
             return getDeclaredMethod(name, returnType.getName(), 
                 (String[]) null);
@@ -1360,7 +1362,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * those in {@link Object}.
      */
     public BCMethod[] getMethods() {
-        Collection allMethods = new LinkedList();
+        Collection<BCMethod> allMethods = new LinkedList<>();
         BCMethod[] methods;
         for (BCClass type = this; type != null; type = type.getSuperclassBC()) {
             methods = type.getDeclaredMethods();
@@ -1377,7 +1379,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * and static initializers are named <code>&lt;clinit&gt;</code>.
      */
     public BCMethod[] getMethods(String name) {
-        Collection matches = new LinkedList();
+        Collection<BCMethod> matches = new LinkedList<>();
         BCMethod[] methods = getMethods();
         for (int i = 0; i < methods.length; i++)
             if (methods[i].getName().equals(name))
@@ -1398,7 +1400,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
         String[] curParams;
         boolean match;
         BCMethod[] methods = getMethods();
-        Collection matches = new LinkedList();
+        Collection<BCMethod> matches = new LinkedList<>();
         for (int i = 0; i < methods.length; i++) {
             if (!methods[i].getName().equals(name))
                 continue;
@@ -1426,7 +1428,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Note that in bytecode, constructors are named <code>&lt;init&gt;</code>
      * and static initializers are named <code>&lt;clinit&gt;</code>.
      */
-    public BCMethod[] getMethods(String name, Class[] paramTypes) {
+    public BCMethod[] getMethods(String name, Class<?>[] paramTypes) {
         if (paramTypes == null)
             return getMethods(name, (String[]) null);
 
@@ -1499,8 +1501,8 @@ public class BCClass extends Annotated implements VisitAcceptor {
      *
      * @return the added method
      */
-    public BCMethod declareMethod(String name, Class returnType,
-        Class[] paramTypes) {
+    public BCMethod declareMethod(String name, Class<?> returnType,
+        Class<?>[] paramTypes) {
         String[] paramNames = null;
         if (paramTypes != null) {
             paramNames = new String[paramTypes.length];
@@ -1534,10 +1536,10 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * Clear all declared methods from this class.
      */
     public void clearDeclaredMethods() {
-        List methods = _state.getMethodsHolder();
+        List<BCMethod> methods = _state.getMethodsHolder();
         BCMethod method;
-        for (Iterator itr = methods.iterator(); itr.hasNext();) {
-            method = (BCMethod) itr.next();
+        for (Iterator<BCMethod> itr = methods.iterator(); itr.hasNext();) {
+            method = itr.next();
             itr.remove();
             method.invalidate();
         }
@@ -1553,10 +1555,10 @@ public class BCClass extends Annotated implements VisitAcceptor {
      * @return true if this class contained the method, false otherwise
      */
     public boolean removeDeclaredMethod(String name) {
-        List methods = _state.getMethodsHolder();
+        List<BCMethod> methods = _state.getMethodsHolder();
         BCMethod method;
-        for (Iterator itr = methods.iterator(); itr.hasNext();) {
-            method = (BCMethod) itr.next();
+        for (Iterator<BCMethod> itr = methods.iterator(); itr.hasNext();) {
+            method = itr.next();
             if (method.getName().equals(name)) {
                 itr.remove();
                 method.invalidate();
@@ -1592,10 +1594,10 @@ public class BCClass extends Annotated implements VisitAcceptor {
 
         String[] curParams;
         boolean match;
-        List methods = _state.getMethodsHolder();
+        List<BCMethod> methods = _state.getMethodsHolder();
         BCMethod method;
-        for (Iterator itr = methods.iterator(); itr.hasNext();) {
-            method = (BCMethod) itr.next();
+        for (Iterator<BCMethod> itr = methods.iterator(); itr.hasNext();) {
+            method = itr.next();
             if (!method.getName().equals(name))
                 continue;
             curParams = method.getParamNames();
@@ -1627,7 +1629,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
      *
      * @return true if this class contained the method, false otherwise
      */
-    public boolean removeDeclaredMethod(String name, Class[] paramTypes) {
+    public boolean removeDeclaredMethod(String name, Class<?>[] paramTypes) {
         if (paramTypes == null)
             return removeDeclaredMethod(name, (String[]) null);
 
@@ -1661,8 +1663,8 @@ public class BCClass extends Annotated implements VisitAcceptor {
     public void moveDeclaredMethod(int fromIdx, int toIdx) {
         if (fromIdx == toIdx)
             return;
-        List methods = _state.getMethodsHolder();
-        Object o = methods.remove(fromIdx);
+        List<BCMethod> methods = _state.getMethodsHolder();
+        BCMethod o = methods.remove(fromIdx);
         methods.add(toIdx, o);
     }
 
@@ -1822,7 +1824,7 @@ public class BCClass extends Annotated implements VisitAcceptor {
         return _project != null;
     }
 
-    Collection getAttributesHolder() {
+    Collection<Attribute> getAttributesHolder() {
         return _state.getAttributesHolder();
     }
 
