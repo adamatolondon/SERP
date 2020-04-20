@@ -22,6 +22,8 @@ import serp.bytecode.lowlevel.*;
 public class BCVisitor {
     /**
      * Visit the given entity.
+     * 
+     * @param obj the visitor object
      */
     public void visit(VisitAcceptor obj) {
         if (obj == null)

@@ -1,4 +1,4 @@
-module org.serp {
+module serp {
 	exports serp.util;
 	exports serp.bytecode.visitor;
 	exports serp.bytecode.lowlevel;

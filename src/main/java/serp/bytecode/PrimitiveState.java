@@ -10,10 +10,10 @@ import java.util.List;
  * @author Abe White
  */
 class PrimitiveState extends State {
-    private final Class _type;
+    private final Class<?> _type;
     private final NameCache _names;
 
-    public PrimitiveState(Class type, NameCache names) {
+    public PrimitiveState(Class<?> type, NameCache names) {
         _type = type;
         _names = names;
     }

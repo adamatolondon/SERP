@@ -16,7 +16,7 @@ public class PrettyPrintVisitor extends BCVisitor {
     private String _prefix = "";
 
     /**
-     * Constructor; all pritning will go to stdout.
+     * Constructor; all printing will go to stdout.
      */
     public PrettyPrintVisitor() {
         _out = new PrintWriter(System.out);

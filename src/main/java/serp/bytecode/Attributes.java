@@ -22,10 +22,13 @@ public abstract class Attributes implements BCEntity {
         return (Attribute[]) attrs.toArray(new Attribute[attrs.size()]);
     }
 
-    /**
-     * Return the attribute with the given name. If multiple attributes
-     * share the name, which is returned is undefined.
-     */
+	/**
+	 * Return the attribute with the given name. If multiple attributes share the
+	 * name, which is returned is undefined.
+	 * 
+	 * @param name the attribute name
+	 * @return the attribute
+	 */
     public Attribute getAttribute(String name) {
         Collection<Attribute> attrs = getAttributesHolder();
         Attribute attr;
@@ -38,11 +41,12 @@ public abstract class Attributes implements BCEntity {
         return null;
     }
 
-    /**
-     * Return all attributes with the given name.
-     *
-     * @return the matching attributes, or empty array if none
-     */
+	/**
+	 * Return all attributes with the given name.
+	 *
+	 * @param name the attribute name
+	 * @return the matching attributes, or empty array if none
+	 */
     public Attribute[] getAttributes(String name) {
         List<Attribute> matches = new LinkedList<>();
         Collection<Attribute> attrs = getAttributesHolder();
@@ -56,10 +60,12 @@ public abstract class Attributes implements BCEntity {
         return (Attribute[]) matches.toArray(new Attribute[matches.size()]);
     }
 
-    /**
-     * Set the attributes for this entity; this method is useful for importing
-     * all attributes from another entity. Set to null or empty array if none.
-     */
+	/**
+	 * Set the attributes for this entity; this method is useful for importing all
+	 * attributes from another entity. Set to null or empty array if none.
+	 * 
+	 * @param attrs the attributes to set
+	 */
     public void setAttributes(Attribute[] attrs) {
         clearAttributes();
         if (attrs != null) 
@@ -67,19 +73,25 @@ public abstract class Attributes implements BCEntity {
                 addAttribute(attrs[i]);
     }
 
-    /**
-     * Import an attribute from another entity, or make a copy of one
-     * on this entity.
-     */
+	/**
+	 * Import an attribute from another entity, or make a copy of one on this
+	 * entity.
+	 * 
+	 * @param attr the attribute name to add
+	 * @return the attribute
+	 */
     public Attribute addAttribute(Attribute attr) {
         Attribute newAttr = addAttribute(attr.getName());
         newAttr.read(attr);
         return newAttr;
     }
 
-    /**
-     * Add an attribute of the given type.
-     */
+	/**
+	 * Add an attribute of the given type.
+	 * 
+	 * @param name the attribute name to add
+	 * @return the new attribute
+	 */
     public Attribute addAttribute(String name) {
         Attribute attr = Attribute.create(name, this);
         getAttributesHolder().add(attr);
@@ -99,21 +111,23 @@ public abstract class Attributes implements BCEntity {
         }
     }
 
-    /**
-     * Remove all attributes with the given name from this entity.
-     *
-     * @return true if an attribute was removed, false otherwise
-     */
+	/**
+	 * Remove all attributes with the given name from this entity.
+	 *
+	 * @param name the attribute name
+	 * @return true if an attribute was removed, false otherwise
+	 */
     public boolean removeAttribute(String name) {
         return removeAttribute(getAttribute(name));
     }
 
-    /**
-     * Remove the given attribute. After being removed, the attribute
-     * is invalid, and the result of any operations on it are undefined.
-     *
-     * @return true if the attribute was removed, false otherwise
-     */
+	/**
+	 * Remove the given attribute. After being removed, the attribute is invalid,
+	 * and the result of any operations on it are undefined.
+	 *
+	 * @param attribute the attribute to remove
+	 * @return true if the attribute was removed, false otherwise
+	 */
     public boolean removeAttribute(Attribute attribute) {
         if ((attribute == null) || !getAttributesHolder().remove(attribute))
             return false;
@@ -121,11 +135,13 @@ public abstract class Attributes implements BCEntity {
         return true;
     }
 
-    /**
-     * Convenience method to be called by BCEntities when being visited
-     * by a {@link BCVisitor}; this method will allow the visitor to visit all
-     * attributes of this entity.
-     */
+	/**
+	 * Convenience method to be called by BCEntities when being visited by a
+	 * {@link BCVisitor}; this method will allow the visitor to visit all attributes
+	 * of this entity.
+	 * 
+	 * @param visit the {@link BCVisitor} interface
+	 */
     void visitAttributes(BCVisitor visit) {
         Attribute attr;
         for (Iterator<Attribute> itr = getAttributesHolder().iterator(); itr.hasNext();) {
@@ -136,11 +152,13 @@ public abstract class Attributes implements BCEntity {
         }
     }
 
-    /**
-     * Build the attribute list from the given stream.
-     * Relies on the ability of attributes to read themselves, and
-     * requires access to the constant pool, which must already by read.
-     */
+	/**
+	 * Build the attribute list from the given stream. Relies on the ability of
+	 * attributes to read themselves, and requires access to the constant pool,
+	 * which must already by read.
+	 * 
+	 * @param in the {@link DataInput} stream
+	 */
     void readAttributes(DataInput in) throws IOException {
         Collection<Attribute> attrs = getAttributesHolder();
         attrs.clear();
@@ -156,10 +174,12 @@ public abstract class Attributes implements BCEntity {
         }
     }
 
-    /**
-     * Writes all the owned attributes to the given stream.
-     * Relies on the ability of attributes to write themselves.
-     */
+	/**
+	 * Writes all the owned attributes to the given stream. Relies on the ability of
+	 * attributes to write themselves.
+	 * 
+	 * @param out the {@link DataOutput} stream
+	 */
     void writeAttributes(DataOutput out) throws IOException {
         Collection<Attribute> attrs = getAttributesHolder();
         out.writeShort(attrs.size());

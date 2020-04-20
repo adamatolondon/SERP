@@ -33,6 +33,8 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Return the index in the class {@link ConstantPool} of the
      * {@link ComplexEntry} describing the field to operate on.
+     * 
+     * @return the index in the class {@link ConstantPool}
      */
     public int getFieldIndex() {
         return _index;
@@ -42,6 +44,7 @@ public abstract class FieldInstruction extends Instruction {
      * Set the index in the class {@link ConstantPool} of the
      * {@link ComplexEntry} describing the field to operate on.
      *
+     * @param index the index in the class {@link ConstantPool}
      * @return this instruction, for method chaining
      */
     public FieldInstruction setFieldIndex(int index) {
@@ -51,6 +54,8 @@ public abstract class FieldInstruction extends Instruction {
 
     /**
      * Return the field this instruction operates on, or null if not set.
+     * 
+     * @return the field this instruction operates on, or null if not set
      */
     public BCField getField() {
         String dec = getFieldDeclarerName();
@@ -67,6 +72,7 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the field this instruction operates on.
      *
+     * @param field the field this instruction operates on
      * @return this instruction, for method chaining
      */
     public FieldInstruction setField(BCField field) {
@@ -79,6 +85,7 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the field this instruction operates on.
      *
+     * @param field the field this instruction operates on
      * @return this instruction, for method chaining
      */
     public FieldInstruction setField(Field field) {
@@ -132,7 +139,7 @@ public abstract class FieldInstruction extends Instruction {
      * @param type the class of the field type
      * @return this instruction, for method chaining
      */
-    public FieldInstruction setField(Class dec, String name, Class type) {
+    public FieldInstruction setField(Class<?> dec, String name, Class<?> type) {
         String decName = (dec == null) ? null : dec.getName();
         String typeName = (type == null) ? null : type.getName();
         return setField(decName, name, typeName);
@@ -146,7 +153,7 @@ public abstract class FieldInstruction extends Instruction {
      * @param type the class of the field type
      * @return this instruction, for method chaining
      */
-    public FieldInstruction setField(String name, Class type) {
+    public FieldInstruction setField(String name, Class<?> type) {
         BCClass owner = getCode().getMethod().getDeclarer();
         String typeName = (type == null) ? null : type.getName();
         return setField(owner.getName(), name, typeName);
@@ -184,10 +191,13 @@ public abstract class FieldInstruction extends Instruction {
     // Name, Type, Owner operations
     ////////////////////////////////
 
-    /**
-     * Return the name of the field this instruction operates on, or null
-     * if not set.
-     */
+	/**
+	 * Return the name of the field this instruction operates on, or null if not
+	 * set.
+	 * 
+	 * @return the name of the field this instruction operates on, or null if not
+	 *         set
+	 */
     public String getFieldName() {
         int index = getFieldIndex();
         if (index == 0)
@@ -203,6 +213,7 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the name of the field this instruction operates on.
      *
+     * @param name the field name
      * @return this instruction, for method chaining
      */
     public FieldInstruction setFieldName(String name) {
@@ -212,6 +223,9 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Return the type of the field this instruction operates on, or null
      * if not set.
+     * 
+	 * @return the type of the field this instruction operates on, or null if not
+	 *         set
      */
     public String getFieldTypeName() {
         int index = getFieldIndex();
@@ -229,18 +243,24 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Return the type of the field this instruction operates on, or null
      * if not set.
+     * 
+	 * @return the type of the field this instruction operates on, or null if not
+	 *         set
      */
-    public Class getFieldType() {
+    public Class<?> getFieldType() {
         String type = getFieldTypeName();
         if (type == null)
             return null;
         return Strings.toClass(type, getClassLoader());
     }
 
-    /**
-     * Return the type of the field this instruction operates on, or null
-     * if not set.
-     */
+	/**
+	 * Return the type of the field this instruction operates on, or null if not
+	 * set.
+	 * 
+	 * @return the type of the field this instruction operates on, or null if not
+	 *         set
+	 */
     public BCClass getFieldTypeBC() {
         String type = getFieldTypeName();
         if (type == null)
@@ -251,6 +271,7 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the type of the field this instruction operates on.
      *
+     * @param type the type of the field
      * @return this instruction, for method chaining
      */
     public FieldInstruction setFieldType(String type) {
@@ -260,9 +281,10 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the type of the field this instruction operates on.
      *
+     * @param type the type of the field
      * @return this instruction, for method chaining
      */
-    public FieldInstruction setFieldType(Class type) {
+    public FieldInstruction setFieldType(Class<?> type) {
         String name = null;
         if (type != null)
             name = type.getName();
@@ -272,6 +294,7 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the type of the field this instruction operates on.
      *
+     * @param type the type of the field
      * @return this instruction, for method chaining
      */
     public FieldInstruction setFieldType(BCClass type) {
@@ -284,6 +307,9 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Return the declaring class of the field this instruction operates on,
      * or null if not set.
+     * 
+	 * @return the declaring class of the field this instruction operates on, or
+	 *         null if not set
      */
     public String getFieldDeclarerName() {
         int index = getFieldIndex();
@@ -298,21 +324,27 @@ public abstract class FieldInstruction extends Instruction {
         return name;
     }
 
-    /**
-     * Return the declaring class of the field this instruction operates on,
-     * or null if not set.
-     */
-    public Class getFieldDeclarerType() {
+	/**
+	 * Return the declaring class of the field this instruction operates on, or null
+	 * if not set.
+	 * 
+	 * @return the declaring class of the field this instruction operates on, or
+	 *         null if not set
+	 */
+    public Class<?> getFieldDeclarerType() {
         String type = getFieldDeclarerName();
         if (type == null)
             return null;
         return Strings.toClass(type, getClassLoader());
     }
 
-    /**
-     * Return the declaring class of the field this instruction operates on,
-     * or null if not set.
-     */
+	/**
+	 * Return the declaring class of the field this instruction operates on, or null
+	 * if not set.
+	 * 
+	 * @return the declaring class of the field this instruction operates on, or
+	 *         null if not set
+	 */
     public BCClass getFieldDeclarerBC() {
         String type = getFieldDeclarerName();
         if (type == null)
@@ -323,6 +355,7 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the declaring class of the field this instruction operates on.
      *
+     * @param type the declaring class
      * @return this instruction, for method chaining
      */
     public FieldInstruction setFieldDeclarer(String type) {
@@ -332,9 +365,10 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the declaring class of the field this instruction operates on.
      *
+     * @param type the declaring class
      * @return this instruction, for method chaining
      */
-    public FieldInstruction setFieldDeclarer(Class type) {
+    public FieldInstruction setFieldDeclarer(Class<?> type) {
         String name = null;
         if (type != null)
             name = type.getName();
@@ -344,6 +378,7 @@ public abstract class FieldInstruction extends Instruction {
     /**
      * Set the declaring class of the field this instruction operates on.
      *
+     * @param type the declaring class
      * @return this instruction, for method chaining
      */
     public FieldInstruction setFieldDeclarer(BCClass type) {
@@ -353,10 +388,14 @@ public abstract class FieldInstruction extends Instruction {
         return setFieldDeclarer(name);
     }
 
-    /**
-     * FieldInstructions are equal if the field they reference is the same,
-     * or if the field of either is unset.
-     */
+	/**
+	 * FieldInstructions are equal if the field they reference is the same, or if
+	 * the field of either is unset.
+	 * 
+	 * @param other the instruction to compare
+	 * @return true if the field they reference is the same, or if the field of
+	 *         either is unset
+	 */
     public boolean equalsInstruction(Instruction other) {
         if (other == this)
             return true;

@@ -18,7 +18,7 @@ public class Annotation implements BCEntity, VisitAcceptor {
     private static Method ENUM_NAME = null;
     static {
         try {
-            Class c = Class.forName("java.lang.Enum");
+            Class<?> c = Class.forName("java.lang.Enum");
             ENUM_VALUEOF = c.getMethod("valueOf", new Class[] {
                 Class.class, String.class });
             ENUM_NAME = c.getMethod("name", (Class[]) null);
@@ -35,10 +35,12 @@ public class Annotation implements BCEntity, VisitAcceptor {
         _owner = owner;
     }
 
-    /**
-     * Annotations are stored in an {@link Annotations} table or as
-     * part of an {@link Annotation} property value.
-     */
+	/**
+	 * Annotations are stored in an {@link Annotations} table or as part of an
+	 * {@link Annotation} property value.
+	 * 
+	 * @return the owner entity
+	 */
     public BCEntity getOwner() {
         return _owner;
     }
@@ -47,10 +49,12 @@ public class Annotation implements BCEntity, VisitAcceptor {
         _owner = null;
     }
 
-    /**
-     * The index in the class {@link ConstantPool} of the
-     * {@link UTF8Entry} holding the type of this annotation.
-     */
+	/**
+	 * The index in the class {@link ConstantPool} of the {@link UTF8Entry} holding
+	 * the type of this annotation.
+	 * 
+	 * @return the index value
+	 */
     public int getTypeIndex() {
         return _typeIndex;
     }
@@ -58,69 +62,88 @@ public class Annotation implements BCEntity, VisitAcceptor {
     /**
      * The index in the class {@link ConstantPool} of the
      * {@link UTF8Entry} holding the type of this annotation.
+     * 
+     * @param index the index value
      */
     public void setTypeIndex(int index) {
         _typeIndex = index;
     }
 
-    /**
-     * The name of this annotation's type.
-     */
+	/**
+	 * The name of this annotation's type.
+	 * 
+	 * @return the annotation name
+	 */
     public String getTypeName() {
         String desc = ((UTF8Entry) getPool().getEntry(_typeIndex)).getValue();
         return getProject().getNameCache().getExternalForm(desc, false);
     }
 
-    /**
-     * The {@link Class} object for this annotation's type.
-     */
-    public Class getType() {
+	/**
+	 * The {@link Class} object for this annotation's type.
+	 * 
+	 * @return the {@link Class} object
+	 */
+    public Class<?> getType() {
         return Strings.toClass(getTypeName(), getClassLoader());
     }
 
-    /**
-     * The bytecode for the type of this annotation.
-     */
+	/**
+	 * The bytecode for the type of this annotation.
+	 * 
+	 * @return the {@link BCClass} object
+	 */
     public BCClass getTypeBC() {
         return getProject().loadClass(getTypeName(), getClassLoader());
     }
 
-    /**
-     * This annotation's type.
-     */
+	/**
+	 * This annotation's type.
+	 * 
+	 * @param type the annotation's type
+	 */
     public void setType(String type) {
         type = getProject().getNameCache().getInternalForm(type, true);
         _typeIndex = getPool().findUTF8Entry(type, true);
     }
 
-    /**
-     * This annotation's type.
-     */
-    public void setType(Class type) {
+	/**
+	 * This annotation's type.
+	 * 
+	 * @param type the type to set
+	 */
+    public void setType(Class<?> type) {
         setType(type.getName());
     }
 
-    /**
-     * This annotation's type.
-     */
+	/**
+	 * This annotation's type.
+	 * 
+	 * @param type the type to set
+	 */
     public void setType(BCClass type) {
         setType(type.getName());
     }
 
-    /**
-     * All declared properties.
-     */
+	/**
+	 * All declared properties.
+	 * 
+	 * @return the {@link Property} array
+	 */
     public Property[] getProperties() {
         if (_properties == null)
             return new Property[0];
+        
         return (Property[]) _properties.toArray
             (new Property[_properties.size()]);
     }
 
-    /**
-     * Set the annotation properties.  This method is useful when
-     * importing properties from another instance.
-     */
+	/**
+	 * Set the annotation properties. This method is useful when importing
+	 * properties from another instance.
+	 * 
+	 * @param props the property array to set
+	 */
     public void setProperties(Property[] props) {
         clearProperties();
         if (props != null)
@@ -128,9 +151,12 @@ public class Annotation implements BCEntity, VisitAcceptor {
                 addProperty(props[i]);
     }
 
-    /**
-     * Return the property with the given name, or null if none.
-     */
+	/**
+	 * Return the property with the given name, or null if none.
+	 * 
+	 * @param name the property name
+	 * @return the {@link Property} object
+	 */
     public Property getProperty(String name) {
         if (_properties == null)
             return null;
@@ -143,25 +169,30 @@ public class Annotation implements BCEntity, VisitAcceptor {
         return null;
     }
 
-    /**
-     * Import a property from another instance.
-     *
-     * @return the newly added property
-     */
+	/**
+	 * Import a property from another instance.
+	 *
+	 * @param p the property to add
+	 * @return the newly added property
+	 */
     public Property addProperty(Property p) {
         Property prop = addProperty(p.getName());
         prop.setValue(p.getValue());
         return prop;
     }
 
-    /**
-     * Add a new property.
-     */
+	/**
+	 * Add a new property.
+	 * 
+	 * @param name the property name
+	 * @return the {@link Property} object
+	 */
     public Property addProperty(String name) {
         Property prop = new Property(this);
         prop.setName(name);
         if (_properties == null)
             _properties = new ArrayList();
+        
         _properties.add(prop);
         return prop;
     }
@@ -177,20 +208,22 @@ public class Annotation implements BCEntity, VisitAcceptor {
         _properties.clear();
     }
 
-    /**
-     * Remove the given property.
-     *
-     * @return true if an property was removed, false otherwise
-     */
+	/**
+	 * Remove the given property.
+	 *
+	 * @param prop the property to remove
+	 * @return true if an property was removed, false otherwise
+	 */
     public boolean removeProperty(Property prop) {
         return prop != null && removeProperty(prop.getName());
     }
 
-    /**
-     * Remove the property with the given name.
-     *
-     * @return true if a property was removed, false otherwise
-     */
+	/**
+	 * Remove the property with the given name.
+	 *
+	 * @param name the property's name to remove
+	 * @return true if a property was removed, false otherwise
+	 */
     public boolean removeProperty(String name) {
         if (name == null || _properties == null)
             return false;
@@ -276,9 +309,11 @@ public class Annotation implements BCEntity, VisitAcceptor {
             _owner = owner;
         }
 
-        /**
-         * The owning annotation.
-         */
+		/**
+		 * The owning annotation.
+		 * 
+		 * @return the annotation
+		 */
         public Annotation getAnnotation() {
             return _owner;
         }
@@ -290,6 +325,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Return the index in the class {@link ConstantPool} of the
          * {@link UTF8Entry} holding the name of this property.
+         * 
+         * @return the index value
          */
         public int getNameIndex() {
             return _nameIndex;
@@ -298,6 +335,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Set the index in the class {@link ConstantPool} of the
          * {@link UTF8Entry} holding the name of this property.
+         * 
+         * @param index the index value
          */
         public void setNameIndex(int index) {
             _nameIndex = index;
@@ -305,14 +344,18 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the name of this property.
+         * 
+         * @return the property's name
          */
         public String getName() {
             return ((UTF8Entry) getPool().getEntry(_nameIndex)).getValue();
         }
 
-        /**
-         * Set the name of this property.
-         */
+		/**
+		 * Set the name of this property.
+		 * 
+		 * @param name the name to set
+		 */
         public void setName(String name) {
             _nameIndex = getPool().findUTF8Entry(name, true);
         }
@@ -320,6 +363,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Return the value of the property as its wrapper type.
          * Returns class values as the class name.
+         * 
+         * @return the value
          */
         public Object getValue() {
             if (_values == null)
@@ -330,9 +375,11 @@ public class Annotation implements BCEntity, VisitAcceptor {
             return vals;
         }
 
-        /**
-         * Extract the Java value.
-         */
+		/**
+		 * Extract the Java value.
+		 * 
+		 * @param val {@link Value} object containing data to extract the value
+		 */
         private Object getValue(Value val) {
             if (val.index == -1)
                 return val.value;
@@ -346,7 +393,7 @@ public class Annotation implements BCEntity, VisitAcceptor {
                 String name = ((UTF8Entry) getPool().getEntry(val.index2)).
                     getValue();
                 try {
-                    Class cls = Class.forName(e, true, getClassLoader());  
+                    Class<?> cls = Class.forName(e, true, getClassLoader());  
                     return ENUM_VALUEOF.invoke(null, new Object[] {cls, name});
                 } catch (Throwable t) {
                     return e + "." + name;
@@ -377,6 +424,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
          * Set value of this property. The value should be an instance of any
          * primitive wrapper type, String, Class, BCClass, an enum constant,
          * an annotation, or an array of any of these types.
+         * 
+         * @param value the value to set
          */
         public void setValue(Object value) {
             if (!value.getClass().isArray()) {
@@ -392,9 +441,12 @@ public class Annotation implements BCEntity, VisitAcceptor {
             }
         }
 
-        /**
-         * Set the given value.
-         */
+		/**
+		 * Set the given value.
+		 * 
+		 * @param val {@link Value} object containing data to set the value
+		 * @param o   object value
+		 */
         private void setValue(Value val, Object o) {
             if (o instanceof String) 
                 setValue(val, (String) o);
@@ -438,11 +490,14 @@ public class Annotation implements BCEntity, VisitAcceptor {
             }
         }
 
-        /**
-         * Return the name of this enum value, or null if not an enum.
-         */
+		/**
+		 * Return the name of this enum value, or null if not an enum.
+		 * 
+		 * @param o the enum object
+		 * @return the enum name
+		 */
         private static String getEnumName(Object o) {
-            for (Class c = o.getClass(); true; c = c.getSuperclass()) {
+            for (Class<?> c = o.getClass(); true; c = c.getSuperclass()) {
                 if (c == Object.class || c == null)
                     return null;
                 if ("java.lang.Enum".equals(c.getName()))
@@ -457,6 +512,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the string value of this property, or null if not set.
+         * 
+         * @return the value
          */
         public String getStringValue() {
             return (String) getValue();
@@ -464,6 +521,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the boolean value of this property, or false if not set.
+         * 
+         * @return the value
          */
         public boolean getBooleanValue() {
             Object value = getValue();
@@ -472,6 +531,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the byte value of this property, or false if not set.
+         * 
+         * @return the value
          */
         public byte getByteValue() {
             Object value = getValue();
@@ -480,6 +541,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the int value of this property, or 0 if not set.
+         * 
+         * @return the value
          */
         public int getIntValue() {
             Object value = getValue();
@@ -488,6 +551,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the long value of this property, or 0 if not set.
+         * 
+         * @return the value
          */
         public long getLongValue() {
             Object value = getValue();
@@ -496,6 +561,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the float value of this property, or 0 if not set.
+         * 
+         * @return the value
          */
         public float getFloatValue() {
             Object value = getValue();
@@ -504,6 +571,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the double value of this property, or 0 if not set.
+         * 
+         * @return the value
          */
         public double getDoubleValue() {
             Object value = getValue();
@@ -512,6 +581,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the short value of this property, or 0 if not set.
+         * 
+         * @return the value
          */
         public short getShortValue() {
             Object value = getValue();
@@ -520,6 +591,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the class value of this property, or null if not set.
+         * 
+         * @return the value
          */
         public String getClassNameValue() {
             return (String) getValue();
@@ -527,6 +600,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Return the annotation value of this property, or null if not set.
+         * 
+         * @return the value
          */
         public Annotation getAnnotationValue() {
             return (Annotation) getValue();
@@ -534,15 +609,20 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the string value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(String value) {
             _values = null;
             setValue(_value, value);
         }
 
-        /**
-         * Set the string value of this property.
-         */
+		/**
+		 * Set the string value of this property.
+		 * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
+		 */
         private void setValue(Value val, String o) {
             val.index = getPool().findUTF8Entry(o, true);
             val.index2 = -1;
@@ -552,6 +632,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the boolean value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(boolean value) {
             _values = null;
@@ -560,6 +642,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the boolean value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setValue(Value val, boolean o) {
             setValue(val, (o) ? 1 : 0);
@@ -568,6 +653,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the byte value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(byte value) {
             _values = null;
@@ -576,6 +663,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the byte value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setValue(Value val, byte o) {
             setValue(val, (int) o);
@@ -584,6 +674,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the int value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(int value) {
             _values = null;
@@ -592,6 +684,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the int value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setValue(Value val, int o) {
             val.index = getPool().findIntEntry(o, true);
@@ -602,6 +697,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the long value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(long value) {
             _values = null;
@@ -610,6 +707,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the long value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setValue(Value val, long o) {
             val.index = getPool().findLongEntry(o, true);
@@ -620,6 +720,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the float value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(float value) {
             _values = null;
@@ -628,6 +730,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the float value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setValue(Value val, float o) {
             val.index = getPool().findFloatEntry(o, true);
@@ -638,6 +743,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the double value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(double value) {
             _values = null;
@@ -646,6 +753,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the double value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setValue(Value val, double o) {
             val.index = getPool().findDoubleEntry(o, true);
@@ -656,6 +766,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the short value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(short value) {
             _values = null;
@@ -664,6 +776,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the short value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setValue(Value val, short o) {
             setValue(val, (int) o);
@@ -672,13 +787,17 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the class value of this property.
+         * 
+         * @param value the value to set
          */
-        public void setValue(Class value) {
+        public void setValue(Class<?> value) {
             setClassNameValue(value.getName());
         }
 
         /**
          * Set the class value of this property.
+         * 
+         * @param value the value to set
          */
         public void setValue(BCClass value) {
             setClassNameValue(value.getName());
@@ -686,6 +805,8 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the class value of this property.
+         * 
+         * @param value the value to set
          */
         public void setClassNameValue(String value) {
             _values = null;
@@ -694,6 +815,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
 
         /**
          * Set the class value of this property.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private void setClassNameValue(Value val, String o) {
             o = getProject().getNameCache().getInternalForm(o, true);
@@ -706,6 +830,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Set the annotation value of this property by importing the given
          * annotation from another instance.
+         * 
+         * @param value the value to set
+         * @return the modified annotation
          */
         public Annotation setValue(Annotation value) {
             _values = null;
@@ -715,6 +842,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Set the annotation value of this property by importing the given
          * annotation from another instance.
+         * 
+		 * @param val the {@link Value} object to set
+		 * @param o   the value to set
          */
         private Annotation setValue(Value val, Annotation o) {
             Annotation anno = new Annotation(this);
@@ -730,6 +860,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Set the annotation value of this property by importing the given
          * annotation from another instance.
+         * 
+         * @param value the value to set
+         * @return the annotation array
          */
         public Annotation[] setValue(Annotation[] value) {
             _value.value = null;
@@ -742,17 +875,23 @@ public class Annotation implements BCEntity, VisitAcceptor {
             return ret;
         }
 
-        /**
-         * Set this property value to a new annotation of the given type, 
-         * returning the annotation for manipulation.
-         */
-        public Annotation newAnnotationValue(Class type) {
+		/**
+		 * Set this property value to a new annotation of the given type, returning the
+		 * annotation for manipulation.
+		 * 
+		 * @param type the type to set
+		 * @return the annotation
+		 */
+        public Annotation newAnnotationValue(Class<?> type) {
             return newAnnotationValue(type.getName());
         }
 
         /**
          * Set this property value to a new annotation of the given type, 
          * returning the annotation for manipulation.
+         * 
+		 * @param type the type to set
+		 * @return the annotation
          */
         public Annotation newAnnotationValue(BCClass type) {
             return newAnnotationValue(type.getName());
@@ -761,6 +900,9 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Set this property value to a new annotation of the given type, 
          * returning the annotation for manipulation.
+         * 
+		 * @param type the type to set
+		 * @return the annotation
          */
         public Annotation newAnnotationValue(String type) {
             Annotation anno = new Annotation(this);
@@ -773,17 +915,25 @@ public class Annotation implements BCEntity, VisitAcceptor {
             return anno;
         }
 
-        /**
-         * Set this property value to a new annotation array of the given type
-         * and length, returning the annotations for manipulation.
-         */
-        public Annotation[] newAnnotationArrayValue(Class type, int length) {
+		/**
+		 * Set this property value to a new annotation array of the given type and
+		 * length, returning the annotations for manipulation.
+		 * 
+		 * @param type   the type to set
+		 * @param length the array length
+		 * @return the annotation array
+		 */
+        public Annotation[] newAnnotationArrayValue(Class<?> type, int length) {
             return newAnnotationArrayValue(type.getName(), length);
         }
 
         /**
          * Set this property value to a new annotation array of the given type
          * and length, returning the annotations for manipulation.
+         * 
+		 * @param type   the type to set
+		 * @param length the array length
+		 * @return the annotation array
          */
         public Annotation[] newAnnotationArrayValue(BCClass type, int length) {
             return newAnnotationArrayValue(type.getName(), length);
@@ -792,6 +942,10 @@ public class Annotation implements BCEntity, VisitAcceptor {
         /**
          * Set this property value to a new annotation array of the given type
          * and length, returning the annotations for manipulation.
+         * 
+		 * @param type   the type to set
+		 * @param length the array length
+		 * @return the annotation array
          */
         public Annotation[] newAnnotationArrayValue(String type, int length) {
             _value.value = null;
@@ -846,9 +1000,12 @@ public class Annotation implements BCEntity, VisitAcceptor {
             return len;
         }
 
-        /**
-         * Return the length of the given value.
-         */
+		/**
+		 * Return the length of the given value.
+		 * 
+		 * @param val the {@link Value} object
+		 * @return the length
+		 */
         private int getLength(Value val) {
             if (val.index2 != -1)
                 return 5; // tag + enum type + enum name
@@ -871,9 +1028,13 @@ public class Annotation implements BCEntity, VisitAcceptor {
                 read(_value, tag, in);
         }
 
-        /**
-         * Read data into the given value.
-         */
+		/**
+		 * Read data into the given value.
+		 * 
+		 * @param val the {@link Value} object
+		 * @param tag the tag value
+		 * @param in  the {@link DataInput} object
+		 */
         private void read(Value val, int tag, DataInput in) throws IOException {
             switch (tag) {
             case 'B':
@@ -946,8 +1107,11 @@ public class Annotation implements BCEntity, VisitAcceptor {
         }
 
         /**
-         * Write the data for the given value to the stream.
-         */
+		 * Write the data for the given value to the stream.
+		 * 
+		 * @param val the {@link Value} object
+		 * @param out the {@link DataOutput} object
+		 */
         private void write(Value val, DataOutput out) throws IOException {
             if (val.index2 != -1) {
                 out.writeByte('e');

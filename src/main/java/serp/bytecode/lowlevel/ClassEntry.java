@@ -22,20 +22,23 @@ public class ClassEntry extends Entry implements ConstantEntry {
     public ClassEntry() {
     }
 
-    /**
-     * Constructor.
-     *
-     * @param nameIndex the constant pool index of the {@link UTF8Entry}
-     * containing the class name
-     */
+	/**
+	 * Constructor.
+	 *
+	 * @param nameIndex the constant pool index of the {@link UTF8Entry} containing
+	 *                  the class name
+	 */
     public ClassEntry(int nameIndex) {
         _nameIndex = nameIndex;
     }
 
-    /**
-     * Return the constant pool index of the {@link UTF8Entry}
-     * containing the class name. Defaults to 0.
-     */
+	/**
+	 * Return the constant pool index of the {@link UTF8Entry} containing the class
+	 * name. Defaults to 0.
+	 * 
+	 * @return the constant pool index of the {@link UTF8Entry} containing the class
+	 *         name. Defaults to 0
+	 */
     public int getNameIndex() {
         return _nameIndex;
     }
@@ -43,6 +46,8 @@ public class ClassEntry extends Entry implements ConstantEntry {
     /**
      * Set the constant pool index of the {@link UTF8Entry}
      * containing the class name.
+     * 
+     * @param nameIndex the constant pool index
      */
     public void setNameIndex(int nameIndex) {
         Object key = beforeModify();
@@ -53,6 +58,8 @@ public class ClassEntry extends Entry implements ConstantEntry {
     /**
      * Return the referenced {@link UTF8Entry}. This method can only
      * be run for entries that have been added to a constant pool.
+     * 
+     * @return the referenced {@link UTF8Entry}
      */
     public UTF8Entry getNameEntry() {
         return (UTF8Entry) getPool().getEntry(_nameIndex);

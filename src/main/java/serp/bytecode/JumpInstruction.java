@@ -22,6 +22,8 @@ public abstract class JumpInstruction extends Instruction
 
     /**
      * Get the current target instruction to jump to, if it has been set.
+     * 
+     * @return the current target instruction to jump to, if it has been set
      */
     public Instruction getTarget() {
         return _target.getTargetInstruction();
@@ -31,6 +33,7 @@ public abstract class JumpInstruction extends Instruction
      * Set the instruction to jump to; the instruction must already be
      * added to the code block.
      *
+     * @param instruction the instruction to set
      * @return this instruction, for method chaining
      */
     public JumpInstruction setTarget(Instruction instruction) {
@@ -38,11 +41,15 @@ public abstract class JumpInstruction extends Instruction
         return this;
     }
 
-    /**
-     * JumpInstructions are equal if they represent the same operation and
-     * the instruction they jump to is the
-     * same, or if the jump Instruction of either is unset.
-     */
+	/**
+	 * JumpInstructions are equal if they represent the same operation and the
+	 * instruction they jump to is the same, or if the jump Instruction of either is
+	 * unset.
+	 * 
+	 * @param other the instruction to compare
+	 * @return true if they represent the same operation and the instruction they
+	 *         jump to is the same, or if the jump Instruction of either is unset
+	 */
     public boolean equalsInstruction(Instruction other) {
         if (this == other)
             return true;
