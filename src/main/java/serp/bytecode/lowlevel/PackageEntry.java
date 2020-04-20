@@ -25,7 +25,7 @@ public class PackageEntry extends Entry implements ConstantEntry {
 	 * Constructor.
 	 *
 	 * @param nameIndex the constant pool index of the {@link UTF8Entry} containing
-	 *                  the class name
+	 *                  the package name
 	 */
     public PackageEntry(int nameIndex) {
         _nameIndex = nameIndex;
@@ -43,11 +43,11 @@ public class PackageEntry extends Entry implements ConstantEntry {
     }
 
 	/**
-	 * Set the constant pool index of the {@link UTF8Entry} containing the class
+	 * Set the constant pool index of the {@link UTF8Entry} containing the package
 	 * name.
 	 * 
 	 * @param nameIndex the constant pool index of the {@link UTF8Entry} containing
-	 *                  the class name
+	 *                  the package name
 	 */
     public void setNameIndex(int nameIndex) {
         Object key = beforeModify();
