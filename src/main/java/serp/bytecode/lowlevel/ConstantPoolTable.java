@@ -29,6 +29,7 @@ public class ConstantPoolTable {
      * Constructor; supply input stream to bytecode.
      * 
      * @param in input stream
+     * @throws IOException stream handling exception
      */
     public ConstantPoolTable(InputStream in) throws IOException {
         this(toByteArray(in));

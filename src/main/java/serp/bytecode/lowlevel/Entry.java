@@ -41,6 +41,7 @@ public abstract class Entry implements VisitAcceptor {
      * 
      * @param in the input stream
      * @return the read entry
+     * @throws IOException stream handling exception
      */
     public static Entry read(DataInput in) throws IOException {
         Entry entry = create(in.readUnsignedByte());
@@ -142,6 +143,7 @@ public abstract class Entry implements VisitAcceptor {
      * It should read all the data for this entry from the given stream.
      * 
      * @param in the input stream
+     * @throws IOException stream handling exception
      */
     abstract void readData(DataInput in) throws IOException;
 
@@ -150,6 +152,7 @@ public abstract class Entry implements VisitAcceptor {
      * It should write all data for this entry to the given stream.
      * 
      * @param out the output stream
+     * @throws IOException stream handling exception
      */
     abstract void writeData(DataOutput out) throws IOException;
 
