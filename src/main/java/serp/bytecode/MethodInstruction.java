@@ -81,6 +81,8 @@ public class MethodInstruction extends Instruction {
     /**
      * Return the index in the class {@link ConstantPool} of the
      * {@link ComplexEntry} describing the method to operate on.
+     * 
+     * @return the index in the class {@link ConstantPool}
      */
     public int getMethodIndex() {
         return _index;

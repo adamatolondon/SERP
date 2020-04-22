@@ -467,6 +467,7 @@ public class ConstantPool implements VisitAcceptor {
      * Fill the constant pool from the given bytecode stream.
      * 
      * @param in the input stream
+     * @throws IOException stream handling exception
      */
     public void read(DataInput in) throws IOException {
         clear();
@@ -485,6 +486,7 @@ public class ConstantPool implements VisitAcceptor {
      * Write the constant pool to the given bytecode stream.
      * 
      * @param out the output stream
+     * @throws IOException stream handling exception
      */
     public void write(DataOutput out) throws IOException {
         out.writeShort(_entries.size() + 1);

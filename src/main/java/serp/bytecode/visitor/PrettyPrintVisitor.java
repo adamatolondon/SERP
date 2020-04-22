@@ -35,6 +35,11 @@ public class PrettyPrintVisitor extends BCVisitor {
      * Invoke with the class or file names to pretty print; the
      * functionality is similar to the <i>javap -c</i> command, but more
      * detailed.
+     * 
+     * @throws ClassNotFoundException in case the class is not found
+     * @throws IOException stream handling exception
+     * 
+     * @param args main parameters
      */
     public static void main(String[] args)
         throws ClassNotFoundException, IOException {
